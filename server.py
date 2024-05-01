@@ -16,19 +16,17 @@ leaderboard = []
 # Difficulty List
 # Used import random for random selection of guessing number game
 def generate_random_int(difficulty):
+    valid_difficulties = ["easy", "medium", "hard"]
 
+    if difficulty.lower() not in valid_difficulties:
+        raise ValueError("Invalid difficulty level.\n")
+    
     if difficulty == "easy":
-        # 1-50
         return random.randint(1, 50)
-    
     elif difficulty == "medium":
-        # 1-100
         return random.randint(1, 100)
-    
     elif difficulty == "hard":
-        # 1-500
         return random.randint(1, 500)
-    
 
 # Client Handler
 def client_handler(conn, addr):
@@ -37,12 +35,19 @@ def client_handler(conn, addr):
 
         # Player Connect
         player_name = conn.recv(1024).decode().strip()
-        print(f"Player {player_name} has joined to the game.")
+        print(f"Player {player_name} has joined the game.")
 
-        # Difficulty
-        conn.sendall(b"Choose Difficulty (easy, medium, hard):\n")
-        difficulty = conn.recv(1024).decode().strip().lower()
-        
+        # Difficulty selection loop
+        while True:
+            conn.sendall(b"Choose Difficulty (easy, medium, hard):\n")
+            difficulty = conn.recv(1024).decode().strip().lower()
+
+            try:
+                generate_random_int(difficulty)
+                break  # Break the loop if the difficulty is valid
+            except ValueError as e:
+                conn.sendall(str(e).encode())
+
         # Guessing Game (Main Loop)
         while True:
             guessme = generate_random_int(difficulty)
@@ -56,7 +61,7 @@ def client_handler(conn, addr):
 
                     # if player left the game
                     if not client_input:
-                        print(f"Player {player_name} has left from the game.")
+                        print(f"Player {player_name} has left the game.")
                         return
                     
                     guess = int(client_input.decode().strip())
@@ -81,11 +86,11 @@ def client_handler(conn, addr):
 
                 # If player closed the game or by the host
                 except ConnectionResetError:
-                    print(f"Player {player_name} connection got closed by the host.")
+                    print(f"Player {player_name} connection closed by the host.")
                     return
 
     except ConnectionAbortedError:
-        print(f"Player {player_name} connection has been stopped.")
+        print(f"Player {player_name} connection stopped.")
 
     finally:
         conn.close()
