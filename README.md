@@ -33,6 +33,8 @@ Guessing Game v1.0 with *Sockets & Randomization* for Number Guessing. Used Pyth
   
 - There's a function `generate_random_int(difficulty)` which generates a random number based on the selected difficulty level.
   
+- There is also a `ValueError/Input Error Handling` inside the function above this message when the player or user accidently types an invalid text or word.
+  
 - The `client_handler` function manages each client connection. It prompts the player to input their name and select a difficulty level for the game. Then, it initiates the guessing game loop.
   
 - Inside the guessing game loop, the server sends prompts to the client to guess the number. It keeps track of the number of attempts and informs the client if the guess is correct or not.
